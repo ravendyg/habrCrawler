@@ -1,4 +1,4 @@
-dateProc <- function(date, i) { # takes list of dates and index of the currently processing record
+dateProc <- function(dates, i) { # takes list of dates and index of the currently processing record
   q = unlist(strsplit(dates[i], " "))
   if (q[1] == "сегодня") { # today record
     q = Sys.Date();
@@ -21,7 +21,7 @@ library(XML)
       # read every hab and collect records
       # time control
 tm = Sys.time() # time control
-where = "habrnew.csv"          # file name. Goes to Documents by default
+where = "/media/slava/Seagate Expansion Drive/Seagate/9/users/habrnewWithAuthor.csv"          # file name. Goes to Documents by default
       
 # some technicalities for date processing
 dayShift = 7 # how deep to look (in days)
@@ -51,6 +51,8 @@ repeat {
       if (typeof(id) == "list") {id = unlist(id)}  
       id_key = seq(1,length(id),2)
       id = id[id_key]
+      # author 
+      auth = xpathSApply(html, "//a[@class='post-author__link']", xmlValue)
       
       # write to csv
       for (i in 1:length(id)) {
@@ -61,10 +63,12 @@ repeat {
             w = unlist(strsplit(w, "\r"))
             w = paste(w[w!=''], collapse='')
                 # convert readed dates into R recognizable smth
-            q=dateProc(dates, i)           
+            q=dateProc(dates, i)         
+              # extract author name
+            authName = strsplit(strsplit(auth[i], "@")[[1]][2], "\n")[[1]][1]
                   # write
             fileCon = file(where, open="a") # open connection for appending
-            writeLines(paste(id[i], q, titles[i], w, sep = ','), fileCon)
+            writeLines(paste(id[i], q, authName, titles[i], w, sep = ','), fileCon)
             close(fileCon)
       }
       print(j)
@@ -95,6 +99,8 @@ repeat {
       #id  = id[key]
       id_key = seq(1,length(id),2)
       id = id[id_key]
+      # author 
+      auth = xpathSApply(html, "//a[@class='post-author__link']", xmlValue)
       
       #id = unlist(strsplit(id, "/"))
       #id = as.integer(id)
@@ -111,9 +117,11 @@ repeat {
             w = paste(w[w!=''], collapse='')
             # convert readed dates into R recognizable smth
             q=dateProc(dates, i) 
+            # extract author name
+            authName = strsplit(strsplit(auth[i], "@")[[1]][2], "\n")[[1]][1]
             # write
             fileCon = file(where, open="a") #open connection for appending
-            writeLines(paste(id[i], dates[i], titles[i], w, sep = ','), fileCon)
+            writeLines(paste(id[i], dates[i], authName, titles[i], w, sep = ','), fileCon)
             close(fileCon)
       }
       print(j)
@@ -121,54 +129,54 @@ repeat {
       j = j + 1
 }
 
-# megamozg
-j = 1
-
-repeat {
-  url = paste("http://megamozg.ru/all/", "page", as.character(j), sep = '')
-  html = htmlTreeParse(url, useInternalNodes = T, encoding = "UTF-8")
-  # titles
-  titles = xpathSApply(html, "//a[@class='post_title']", xmlValue)
-  if (length(titles) == 0) {break}
-  # dates
-  dates = xpathSApply(html, "//div[@class='published']", xmlValue)
-  # content
-  content = xpathSApply(html, "//div[@class='content html_format']", xmlValue)  
-  # id
-  #id = xpathSApply(html, "//div[@class='post shortcuts_item']", xmlAttrs)
-  
-  id = xpathSApply(html, "//a[@class='post_title']", xmlAttrs)     
-  #id2 = xpathSApply(html, "//div[@class='post translation shortcuts_item']", xmlAttrs)
-  ##id=c(id, id2)
-  if (typeof(id) == "list") {id = unlist(id)}  
-  #key = seq(from = 2, to = length(id), by = 2)
-  #id  = id[key]
-  id_key = seq(1,length(id),2)
-  id = id[id_key]
-  
-  #id = unlist(strsplit(id, "/"))
-  #id = as.integer(id)
-  #id = id[!is.na(id)]
-  #key = seq(from = 2, to = length(id), by = 2)
-  #id  = as.integer(id[key])
-  # write to csv
-  for (i in 1:length(id)) {
-    # modify content
-    w = unlist(strsplit(content[i], ","))
-    w = unlist(strsplit(w, "\n"))
-    w = unlist(strsplit(w, "\t"))
-    w = unlist(strsplit(w, "\r"))
-    w = paste(w[w!=''], collapse='')
-    # convert readed dates into R recognizable smth
-    q=dateProc(dates, i)
-    # write
-    fileCon = file(where, open="a") #open connection for appending
-    writeLines(paste(id[i], dates[i], titles[i], w, sep = ','), fileCon)
-    close(fileCon)
-  }
-  print(j)
-  if (q+dayShift<Sys.Date()) {break} # old data
-  j = j + 1
-}
+# # megamozg
+# j = 1
+# 
+# repeat {
+#   url = paste("http://megamozg.ru/all/", "page", as.character(j), sep = '')
+#   html = htmlTreeParse(url, useInternalNodes = T, encoding = "UTF-8")
+#   # titles
+#   titles = xpathSApply(html, "//a[@class='post_title']", xmlValue)
+#   if (length(titles) == 0) {break}
+#   # dates
+#   dates = xpathSApply(html, "//div[@class='published']", xmlValue)
+#   # content
+#   content = xpathSApply(html, "//div[@class='content html_format']", xmlValue)  
+#   # id
+#   #id = xpathSApply(html, "//div[@class='post shortcuts_item']", xmlAttrs)
+#   
+#   id = xpathSApply(html, "//a[@class='post_title']", xmlAttrs)     
+#   #id2 = xpathSApply(html, "//div[@class='post translation shortcuts_item']", xmlAttrs)
+#   ##id=c(id, id2)
+#   if (typeof(id) == "list") {id = unlist(id)}  
+#   #key = seq(from = 2, to = length(id), by = 2)
+#   #id  = id[key]
+#   id_key = seq(1,length(id),2)
+#   id = id[id_key]
+#   
+#   #id = unlist(strsplit(id, "/"))
+#   #id = as.integer(id)
+#   #id = id[!is.na(id)]
+#   #key = seq(from = 2, to = length(id), by = 2)
+#   #id  = as.integer(id[key])
+#   # write to csv
+#   for (i in 1:length(id)) {
+#     # modify content
+#     w = unlist(strsplit(content[i], ","))
+#     w = unlist(strsplit(w, "\n"))
+#     w = unlist(strsplit(w, "\t"))
+#     w = unlist(strsplit(w, "\r"))
+#     w = paste(w[w!=''], collapse='')
+#     # convert readed dates into R recognizable smth
+#     q=dateProc(dates, i)
+#     # write
+#     fileCon = file(where, open="a") #open connection for appending
+#     writeLines(paste(id[i], dates[i], titles[i], w, sep = ','), fileCon)
+#     close(fileCon)
+#   }
+#   print(j)
+#   if (q+dayShift<Sys.Date()) {break} # old data
+#   j = j + 1
+# }
 
 print(Sys.time() - tm)
