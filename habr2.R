@@ -17,7 +17,7 @@ dateProc <- function(dates, i) { # takes list of dates and index of the currentl
   return(q);  # returns the date in Date format
 }
 
-traceAuthors = F
+traceAuthors = TRUE
 
 library(XML)
       # read every hab and collect records
