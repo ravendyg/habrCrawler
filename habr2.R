@@ -6,32 +6,30 @@ dateProc <- function(dates, i) { # takes list of dates and index of the currentl
     q = Sys.Date() - 1;
   }
   else {
-    q = q[q != ""][c(1, 2)] # need only day and month; presume you aren't gonna extract 
+    q = q[q != ""][c(1, 2, 3)] # need only day and month; presume you aren't gonna extract 
     q[2] = which(monthConvert==q[2])
-    if (curMonth == "01" && q[2] == 12) { # new year cross
-      q = as.Date(paste(prevYear, q[2], q[1], sep="/"))
+    if (nchar(q[3])!=4) {
+      # current year
+      # 
+      q = as.Date(paste(format(Sys.Date(), "%Y"), q[2], q[1], sep="/"))
     } else {
-      q = as.Date(paste(curYear, q[2], q[1], sep="/"))
+      q = as.Date(paste(q[3], q[2], q[1], sep="/"))
     }
+    #if (curMonth == "01" && q[2] == 12) { # new year cross
+    #  
+    #} else {
+    #  q = as.Date(paste(q[2], q[2], q[1], sep="/"))
+    #}
   }
   return(q);  # returns the date in Date format
 }
-
-traceAuthors = TRUE
 
 library(XML)
       # read every hab and collect records
       # time control
 tm = Sys.time() # time control
-where = "/media/slava/Seagate Expansion Drive/Seagate/9/users/"          # file name. Goes to Documents by default
-outFile = "habrnewWithAuthor.csv" # 
-if (traceAuthors) {
-  authorsListSrc = "habrAuthors.csv" # list of the authors we want to be notified about
-  authorsList = read.csv(paste(where,authorsListSrc, sep=''), header = F, stringsAsFactors=FALSE)[,1]
-}
-      
+
 # some technicalities for date processing
-dayShift = 7 # how deep to look (in days)
 curYear = unlist(strsplit(toString(Sys.Date()), "-"))[1] # current year
 prevYear = unlist(strsplit(toString(Sys.Date()-365), "-"))[1] # smtimes need previous year
 if (curYear == prevYear) { # rare case of leap year + 31 of December
@@ -41,8 +39,9 @@ curMonth = unlist(strsplit(toString(Sys.Date()), "-"))[2] # current month
 monthConvert = c("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря")
 
 # iterate over specified hab
-readHabr <- function (basePath, optionalLimit = 0) {
-  j = 1
+readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7) {
+  # don't check startFrom, limitNumber that stuff validity
+  j = startFrom
   repeat {
     url = paste(basePath, "page", as.character(j), sep = '')
     html = htmlTreeParse(url, useInternalNodes = T, encoding = "UTF-8")
@@ -63,13 +62,14 @@ readHabr <- function (basePath, optionalLimit = 0) {
     
     # write to csv
     for (i in 1:length(id)) {
+      # will read at least one page before date condition will kick in
       # modify content
       w = unlist(strsplit(content[i], ","))
       w = unlist(strsplit(w, "\n"))
       w = unlist(strsplit(w, "\t"))
       w = unlist(strsplit(w, "\r"))
       w = paste(w[w!=''], collapse='')
-      w = strtrim(w, 500)
+      # w = strtrim(w, 500)
       # convert readed dates into R recognizable smth
       q=dateProc(dates, i)         
       # extract author name
@@ -84,18 +84,32 @@ readHabr <- function (basePath, optionalLimit = 0) {
     }
     print(j)
     if (q+dayShift<Sys.Date() || # old data
-        (optionalLimit > 0 && j == optionalLimit)) {  # artificially introduced limit
+        (limitNumber > 0 && (j-startFrom+1) == limitNumber)) {  # artificially introduced limit
       break
     }
     j = j + 1
   }
 }
 
+# path settings
+where = "/media/slava/Seagate Expansion Drive/Seagate/9/users/"          # file name. Goes to Documents by default
+outFile = "habrnewWithAuthor.csv"
+#outFile = "testHabr.csv"
+authorsListSrc = "habrAuthors.csv" # list of the authors we want to be notified about
+
+traceAuthors = TRUE
+
+if (traceAuthors) {
+  authorsList = read.csv(paste(where,authorsListSrc, sep=''), header = F, stringsAsFactors=FALSE)[,1]
+}
+
 # habrahabr
-readHabr("http://habrahabr.ru/all/",2)
+readHabr("http://habrahabr.ru/all/")
 # geektimes
-readHabr("http://geektimes.ru/all/",2)
+readHabr("http://geektimes.ru/all/")
 # megamozg
 #readHabr("http://megamozg.ru/all/")
+# any hub
+#readHabr("http://geektimes.ru/hub/google/", limitNumber = 20, startFrom = 1, dayShift = 107)
 
 print(Sys.time() - tm)
