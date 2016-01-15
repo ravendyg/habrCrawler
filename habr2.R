@@ -71,6 +71,8 @@ readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7, st
       authName = strsplit(strsplit(auth[i], "@")[[1]][2], "\n")[[1]][1]
       if (traceAuthors && authName %in% authorsList)            {
         titles[i] = paste('@@@', titles[i], sep=' ')
+      } else if (markAuthorsNegative && authName %in% negativeAuthorsList) {
+        titles[i] = paste('---', titles[i], sep=' ')
       }
       # write
       fileCon = file(paste(where,outFile,sep=''), open="a") # open connection for appending
@@ -92,11 +94,16 @@ where = "/media/slava/Seagate Expansion Drive/Seagate/9/users/"          # file 
 #outFile = "habrnewWithAuthor.csv"
 outFile = "testHabr2.csv"
 authorsListSrc = "habrAuthors.csv" # list of the authors we want to be notified about
+negativeAuthorsListSrc = "habrAuthorsNegative.csv" # list of the authors we want to be notified about, but differently
 
 traceAuthors = TRUE
+markAuthorsNegative = TRUE
 
 if (traceAuthors) {
   authorsList = read.csv(paste(where,authorsListSrc, sep=''), header = F, stringsAsFactors=FALSE)[,1]
+}
+if (markAuthorsNegative) {
+  negativeAuthorsList = read.csv(paste(where,negativeAuthorsListSrc, sep=''), header = F, stringsAsFactors=FALSE)[,1]
 }
 
 # habrahabr
@@ -106,6 +113,6 @@ if (traceAuthors) {
 # megamozg
 #readHabr("http://megamozg.ru/all/")
 # any hub
-readHabr("http://geektimes.ru/hub/popular_science/", limitNumber = 196, startFrom = 25, stopAt = 27, dayShift = -1)
+readHabr("http://geektimes.ru/hub/popular_science/", limitNumber = 196, startFrom = 1, stopAt = 3, dayShift = -1)
 
 print(Sys.time() - tm)
