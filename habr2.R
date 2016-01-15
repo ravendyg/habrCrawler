@@ -15,11 +15,6 @@ dateProc <- function(dates, i) { # takes list of dates and index of the currentl
     } else {
       q = as.Date(paste(q[3], q[2], q[1], sep="/"))
     }
-    #if (curMonth == "01" && q[2] == 12) { # new year cross
-    #  
-    #} else {
-    #  q = as.Date(paste(q[2], q[2], q[1], sep="/"))
-    #}
   }
   return(q);  # returns the date in Date format
 }
@@ -83,7 +78,7 @@ readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7) {
       close(fileCon)
     }
     print(j)
-    if (q+dayShift<Sys.Date() || # old data
+    if ((dayShift != -1 && q+dayShift<Sys.Date()) || # old data
         (limitNumber > 0 && (j-startFrom+1) == limitNumber)) {  # artificially introduced limit
       break
     }
@@ -93,8 +88,8 @@ readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7) {
 
 # path settings
 where = "/media/slava/Seagate Expansion Drive/Seagate/9/users/"          # file name. Goes to Documents by default
-outFile = "habrnewWithAuthor.csv"
-#outFile = "testHabr.csv"
+#outFile = "habrnewWithAuthor.csv"
+outFile = "testHabr.csv"
 authorsListSrc = "habrAuthors.csv" # list of the authors we want to be notified about
 
 traceAuthors = TRUE
@@ -104,12 +99,12 @@ if (traceAuthors) {
 }
 
 # habrahabr
-readHabr("http://habrahabr.ru/all/")
+#readHabr("http://habrahabr.ru/all/")
 # geektimes
-readHabr("http://geektimes.ru/all/")
+#readHabr("http://geektimes.ru/all/")
 # megamozg
 #readHabr("http://megamozg.ru/all/")
 # any hub
-#readHabr("http://geektimes.ru/hub/google/", limitNumber = 20, startFrom = 1, dayShift = 107)
+readHabr("http://geektimes.ru/hub/popular_science/", limitNumber = 196, startFrom = 1, dayShift = -1)
 
 print(Sys.time() - tm)
