@@ -34,8 +34,8 @@ curMonth = unlist(strsplit(toString(Sys.Date()), "-"))[2] # current month
 monthConvert = c("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря")
 
 # iterate over specified hab
-readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7) {
-  # don't check startFrom, limitNumber that stuff validity
+readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7, stopAt = 0) {
+  # don't check startFrom, limitNumber validity
   j = startFrom
   repeat {
     url = paste(basePath, "page", as.character(j), sep = '')
@@ -78,8 +78,9 @@ readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7) {
       close(fileCon)
     }
     print(j)
-    if ((dayShift != -1 && q+dayShift<Sys.Date()) || # old data
-        (limitNumber > 0 && (j-startFrom+1) == limitNumber)) {  # artificially introduced limit
+    if ((dayShift > 0 && q+dayShift<Sys.Date()) || # old data
+        (limitNumber > 0 && (j-startFrom+1) == limitNumber) ||
+        (stopAt > 0 && j >= stopAt)) {  # artificially introduced limit
       break
     }
     j = j + 1
@@ -89,7 +90,7 @@ readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7) {
 # path settings
 where = "/media/slava/Seagate Expansion Drive/Seagate/9/users/"          # file name. Goes to Documents by default
 #outFile = "habrnewWithAuthor.csv"
-outFile = "testHabr.csv"
+outFile = "testHabr2.csv"
 authorsListSrc = "habrAuthors.csv" # list of the authors we want to be notified about
 
 traceAuthors = TRUE
@@ -105,6 +106,6 @@ if (traceAuthors) {
 # megamozg
 #readHabr("http://megamozg.ru/all/")
 # any hub
-readHabr("http://geektimes.ru/hub/popular_science/", limitNumber = 196, startFrom = 1, dayShift = -1)
+readHabr("http://geektimes.ru/hub/popular_science/", limitNumber = 196, startFrom = 25, stopAt = 27, dayShift = -1)
 
 print(Sys.time() - tm)
