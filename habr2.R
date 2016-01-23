@@ -19,6 +19,7 @@ dateProc <- function(dates, i) { # takes list of dates and index of the currentl
   return(q);  # returns the date in Date format
 }
 
+library(RCurl)
 library(XML)
       # read every hab and collect records
       # time control
@@ -38,8 +39,9 @@ readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7, st
   # don't check startFrom, limitNumber validity
   j = startFrom
   repeat {
-    url = paste(basePath, "page", as.character(j), sep = '')
-    html = htmlTreeParse(url, useInternalNodes = T, encoding = "UTF-8")
+    url = paste(basePath, "page", as.character(j), '/', sep = '')
+    urlContent = getURL(url)
+    html = htmlTreeParse(urlContent, useInternalNodes = T, encoding = "UTF-8")
     # titles
     titles = xpathSApply(html, "//a[@class='post_title']", xmlValue)
     if (length(titles) == 0) {break}
@@ -91,8 +93,8 @@ readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7, st
 
 # path settings
 where = "/media/slava/Seagate Expansion Drive/Seagate/9/users/"          # file name. Goes to Documents by default
-#outFile = "habrnewWithAuthor.csv"
-outFile = "testHabr2.csv"
+outFile = "habrnewWithAuthor.csv"
+#outFile = "testHabr2.csv"
 authorsListSrc = "habrAuthors.csv" # list of the authors we want to be notified about
 negativeAuthorsListSrc = "habrAuthorsNegative.csv" # list of the authors we want to be notified about, but differently
 
@@ -107,12 +109,19 @@ if (markAuthorsNegative) {
 }
 
 # habrahabr
-#readHabr("http://habrahabr.ru/all/")
+readHabr("https://habrahabr.ru/all/")
 # geektimes
-#readHabr("http://geektimes.ru/all/")
+readHabr("https://geektimes.ru/all/")
 # megamozg
-#readHabr("http://megamozg.ru/all/")
+readHabr("https://megamozg.ru/all/")
 # any hub
-readHabr("http://geektimes.ru/hub/popular_science/", limitNumber = 196, startFrom = 1, stopAt = 3, dayShift = -1)
+#readHabr("https://habrahabr.ru/hub/git/", limitNumber = 196, startFrom = 1, stopAt = 27, dayShift = -1)
 
 print(Sys.time() - tm)
+
+#library(RCurl)
+
+#j=1
+#url = paste("https://habrahabr.ru/all/", "page", as.character(j), '/', sep = '')
+#readLines(url, encoding = "UTF-8")
+#readHabr("https://habrahabr.ru/all/", limitNumber = 1)
