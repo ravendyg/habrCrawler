@@ -92,7 +92,7 @@ readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7, st
 }
 
 # path settings
-where = "/media/slava/Seagate Expansion Drive/Seagate/9/users/"          # file name. Goes to Documents by default
+where = "/media/me/Seagate Expansion Drive/Seagate/9/users/"          # file name. Goes to Documents by default
 outFile = "habrnewWithAuthor.csv"
 #outFile = "testHabr2.csv"
 authorsListSrc = "habrAuthors.csv" # list of the authors we want to be notified about
@@ -115,7 +115,8 @@ readHabr("https://geektimes.ru/all/")
 # megamozg
 readHabr("https://megamozg.ru/all/")
 # any hub
-#readHabr("https://habrahabr.ru/hub/git/", limitNumber = 196, startFrom = 1, stopAt = 27, dayShift = -1)
+#readHabr("https://geektimes.ru/hub/biotech/", limitNumber = 196, startFrom = 1, stopAt = 55, dayShift = -1)
+#readHabr("https://geektimes.ru/hub/gadgets/", limitNumber = 196, startFrom = 1, stopAt = 92, dayShift = -1)
 
 print(Sys.time() - tm)
 

@@ -28,6 +28,8 @@ readHabr("http://geektimes.ru/hub/google/", startFrom = 1, limitNumber = 20, day
 # stopAt - закончить на странице (по умолчанию отключено)
 ```
 Работает со всеми ресурсами на хабре, гиктаймс, мегамозге, имеющими форму "ресурс/page{n}"
-## https
-23 января впервые столкнулся с перездом хабра на https.
-Теперь страница выкачивается отдельно с помощью RCurl, а затем скармливается в XML парсер. На Debian Jessie (BunsenLabs Hydrogen) 32x эта библиотека потребовала предварительной установки libcurl4-gnutls-dev (http://askubuntu.com/questions/359267/cannot-find-curl-config-in-ubuntu-13-04). Скорее всего, это решение будет работать и для других версий Debian/Ubuntu, вероятно, и для прочих Linux осей; под Windows не тестировал. Если вдруг случится чудо и кто-то ещё будет этим поделием пользоваться, отпишитесь о результатах ).
+
+## Зависимости
+RCurl требует установки libcurl4-gnutls-dev (http://askubuntu.com/questions/359267/cannot-find-curl-config-in-ubuntu-13-04)
+XML требует xml2-config
+Работало на Debian Jessie (BunsenLabs Hydrogen) 32x и 64x. Под Windows не тестировал.
