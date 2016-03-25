@@ -19,6 +19,7 @@ dateProc <- function(dates, i) { # takes list of dates and index of the currentl
   return(q);  # returns the date in Date format
 }
 
+luibrary(bitops)
 library(RCurl)
 library(XML)
       # read every hab and collect records
@@ -61,12 +62,17 @@ readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7, st
     for (i in 1:length(id)) {
       # will read at least one page before date condition will kick in
       # modify content
-      w = unlist(strsplit(content[i], ","))
-      w = unlist(strsplit(w, "\n"))
-      w = unlist(strsplit(w, "\t"))
-      w = unlist(strsplit(w, "\r"))
-      w = paste(w[w!=''], collapse='')
-      # w = strtrim(w, 500)
+      w = gsub(",", "", content[i])
+      w = gsub(";", "", w)
+      w = gsub("\t", "", w)
+      w = gsub("\n", "", w)
+      w = gsub("\r", "", w)
+      #w = unlist(strsplit(content[i], ","))
+      #w = unlist(strsplit(w, "\n"))
+      #w = unlist(strsplit(w, "\t"))
+      #w = unlist(strsplit(w, "\r"))
+      #w = paste(w[w!=''], collapse='')
+      w = strtrim(w, 500)
       # convert readed dates into R recognizable smth
       q=dateProc(dates, i)         
       # extract author name
@@ -92,7 +98,7 @@ readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7, st
 }
 
 # path settings
-where = "/media/me/Seagate Expansion Drive/Seagate/9/users/"          # file name. Goes to Documents by default
+where = "/home/me/R/"          # file name. Goes to Documents by default
 outFile = "habrnewWithAuthor.csv"
 #outFile = "testHabr2.csv"
 authorsListSrc = "habrAuthors.csv" # list of the authors we want to be notified about
@@ -109,11 +115,11 @@ if (markAuthorsNegative) {
 }
 
 # habrahabr
-readHabr("https://habrahabr.ru/all/")
+readHabr("https://habrahabr.ru/all/", dayShift = 8)
 # geektimes
-readHabr("https://geektimes.ru/all/")
+readHabr("https://geektimes.ru/all/", dayShift = 8)
 # megamozg
-readHabr("https://megamozg.ru/all/")
+readHabr("https://megamozg.ru/all/", dayShift = 8)
 # any hub
 #readHabr("https://geektimes.ru/hub/biotech/", limitNumber = 196, startFrom = 1, stopAt = 55, dayShift = -1)
 #readHabr("https://geektimes.ru/hub/gadgets/", limitNumber = 196, startFrom = 1, stopAt = 92, dayShift = -1)
