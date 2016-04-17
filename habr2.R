@@ -1,4 +1,4 @@
-dateProc <- function(dates, i) { # takes list of dates and index of the currently processing record
+dateProc <- function(dates, i, months) { # takes list of dates and index of the currently processing record
   q = unlist(strsplit(dates[i], " "))
   if (q[1] == "сегодня") { # today record
     q = Sys.Date();
@@ -7,7 +7,7 @@ dateProc <- function(dates, i) { # takes list of dates and index of the currentl
   }
   else {
     q = q[q != ""][c(1, 2, 3)] # need only day and month; presume you aren't gonna extract 
-    q[2] = which(monthConvert==q[2])
+    q[2] = which(months==q[2])
     if (nchar(q[3])!=4) {
       # current year
       # 
@@ -34,9 +34,10 @@ if (curYear == prevYear) { # rare case of leap year + 31 of December
 }
 curMonth = unlist(strsplit(toString(Sys.Date()), "-"))[2] # current month
 monthConvert = c("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря")
+monthConvertHabr = c("Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь")
 
 # iterate over specified hab
-readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7, stopAt = 0) {
+readHabr <- function (basePath, months, limitNumber = 0, startFrom = 1, dayShift = 7, stopAt = 0) {
   # don't check startFrom, limitNumber validity
   j = startFrom
   repeat {
@@ -46,6 +47,8 @@ readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7, st
     # titles
     titles = xpathSApply(html, "//a[@class='post_title']", xmlValue)
     if (length(titles) == 0) {break}
+    titles = gsub(",", "", titles)
+    titles = gsub(";", "", titles)
     # dates
     dates = xpathSApply(html, "//div[@class='published']", xmlValue)
     # content
@@ -74,7 +77,7 @@ readHabr <- function (basePath, limitNumber = 0, startFrom = 1, dayShift = 7, st
       #w = paste(w[w!=''], collapse='')
       w = strtrim(w, 500)
       # convert readed dates into R recognizable smth
-      q=dateProc(dates, i)         
+      q=dateProc(dates, i, months)         
       # extract author name
       authName = strsplit(strsplit(auth[i], "@")[[1]][2], "\n")[[1]][1]
       if (traceAuthors && authName %in% authorsList)            {
@@ -115,11 +118,11 @@ if (markAuthorsNegative) {
 }
 
 # habrahabr
-readHabr("https://habrahabr.ru/all/", dayShift = 8)
+readHabr("https://habrahabr.ru/all/", monthConvertHabr)
 # geektimes
-readHabr("https://geektimes.ru/all/", dayShift = 8)
+readHabr("https://geektimes.ru/all/", monthConvert)
 # megamozg
-readHabr("https://megamozg.ru/all/", dayShift = 8)
+readHabr("https://megamozg.ru/all/", monthConvert)
 # any hub
 #readHabr("https://geektimes.ru/hub/biotech/", limitNumber = 196, startFrom = 1, stopAt = 55, dayShift = -1)
 #readHabr("https://geektimes.ru/hub/gadgets/", limitNumber = 196, startFrom = 1, stopAt = 92, dayShift = -1)
