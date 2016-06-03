@@ -1,8 +1,8 @@
 dateProc <- function(dates, i, months) { # takes list of dates and index of the currently processing record
   q = unlist(strsplit(dates[i], " "))
-  if (q[1] == "сегодня") { # today record
+  if (q[1] == "??????????????") { # today record
     q = Sys.Date();
-  } else if (q[1] == "вчера") { # yesterday record
+  } else if (q[1] == "??????????") { # yesterday record
     q = Sys.Date() - 1;
   }
   else {
@@ -33,8 +33,8 @@ if (curYear == prevYear) { # rare case of leap year + 31 of December
   prevYear = unlist(strsplit(toStriqng(Sys.Date()-366), "-"))[1]
 }
 curMonth = unlist(strsplit(toString(Sys.Date()), "-"))[2] # current month
-monthConvert = c("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря")
-monthConvertHabr = c("Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь")
+monthConvert = c("????????????", "??????????????", "??????????", "????????????", "??????", "????????", "????????", "??????????????", "????????????????", "??????????????", "????????????", "??????????????")
+monthConvertHabr = c("????????????", "??????????????", "????????", "????????????", "??????", "????????", "????????", "????????????", "????????????????", "??????????????", "????????????", "??????????????")
 
 # iterate over specified hab
 readHabr <- function (basePath, months, limitNumber = 0, startFrom = 1, dayShift = 7, stopAt = 0) {
@@ -45,16 +45,19 @@ readHabr <- function (basePath, months, limitNumber = 0, startFrom = 1, dayShift
     urlContent = getURL(url)
     html = htmlTreeParse(urlContent, useInternalNodes = T, encoding = "UTF-8")
     # titles
-    titles = xpathSApply(html, "//a[@class='post_title']", xmlValue)
+    #titles = xpathSApply(html, "//a[@class='post_title']", xmlValue)
+    titles = xpathSApply(html, "//a[@class='post__title_link']", xmlValue)
     if (length(titles) == 0) {break}
     titles = gsub(",", "", titles)
     titles = gsub(";", "", titles)
     # dates
-    dates = xpathSApply(html, "//div[@class='published']", xmlValue)
+    #dates = xpathSApply(html, "//div[@class='published']", xmlValue)
+    dates = xpathSApply(html, "//span[@class='post__time_published']", xmlValue)
     # content
     content = xpathSApply(html, "//div[@class='content html_format']", xmlValue)  
     # id      
-    id = xpathSApply(html, "//a[@class='post_title']", xmlAttrs)     
+    #id = xpathSApply(html, "//a[@class='post_title']", xmlAttrs)
+    id = xpathSApply(html, "//a[@class='post__title_link']", xmlAttrs)     
     if (typeof(id) == "list") {id = unlist(id)}  
     id_key = seq(1,length(id),2)
     id = id[id_key]
@@ -83,7 +86,7 @@ readHabr <- function (basePath, months, limitNumber = 0, startFrom = 1, dayShift
       if (traceAuthors && authName %in% authorsList)            {
         titles[i] = paste('@@@', titles[i], sep=' ')
       } else if (markAuthorsNegative && authName %in% negativeAuthorsList) {
-        titles[i] = paste('---', titles[i], sep=' ')
+        titles[i] = paste('`---', titles[i], sep=' ')
       }
       # write
       fileCon = file(paste(where,outFile,sep=''), open="a") # open connection for appending
@@ -101,7 +104,7 @@ readHabr <- function (basePath, months, limitNumber = 0, startFrom = 1, dayShift
 }
 
 # path settings
-where = "/home/me/R/"          # file name. Goes to Documents by default
+where = "C:\\Users\\jaros\\OneDrive\\??????????????????\\"          # file name. Goes to Documents by default
 outFile = "habrnewWithAuthor.csv"
 #outFile = "testHabr2.csv"
 authorsListSrc = "habrAuthors.csv" # list of the authors we want to be notified about
@@ -118,11 +121,9 @@ if (markAuthorsNegative) {
 }
 
 # habrahabr
-readHabr("https://habrahabr.ru/all/", monthConvertHabr)
+readHabr("https://habrahabr.ru/all/", monthConvert)
 # geektimes
 readHabr("https://geektimes.ru/all/", monthConvert)
-# megamozg
-readHabr("https://megamozg.ru/all/", monthConvert)
 # any hub
 #readHabr("https://geektimes.ru/hub/biotech/", limitNumber = 196, startFrom = 1, stopAt = 55, dayShift = -1)
 #readHabr("https://geektimes.ru/hub/gadgets/", limitNumber = 196, startFrom = 1, stopAt = 92, dayShift = -1)
