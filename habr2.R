@@ -1,4 +1,5 @@
 dateProc <- function(dates, i, months) { # takes list of dates and index of the currently processing record
+  dates[i] = gsub("[\r\n]|^\\s+|\\s+$", "", dates[i])
   q = unlist(strsplit(dates[i], " "))
   if (q[1] == "сегодня") { # today record
     q = Sys.Date();
