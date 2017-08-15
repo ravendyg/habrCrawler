@@ -53,9 +53,10 @@ readHabr <- function (basePath, months, limitNumber = 0, startFrom = 1, dayShift
     titles = gsub(";", "", titles)
     # dates
     #dates = xpathSApply(html, "//div[@class='published']", xmlValue)
-    dates = xpathSApply(html, "//span[@class='post__time_published']", xmlValue)
+    dates = xpathSApply(html, "//span[@class='post__time']", xmlValue)
     # content
-    content = xpathSApply(html, "//div[@class='content html_format']", xmlValue)  
+    content = xpathSApply(html, "//div[@class='post__text post__text-html js-mediator-article']", xmlValue)  
+
     # id      
     #id = xpathSApply(html, "//a[@class='post_title']", xmlAttrs)
     id = xpathSApply(html, "//a[@class='post__title_link']", xmlAttrs)     
@@ -63,7 +64,7 @@ readHabr <- function (basePath, months, limitNumber = 0, startFrom = 1, dayShift
     id_key = seq(1,length(id),2)
     id = id[id_key]
     # author 
-    auth = xpathSApply(html, "//a[@class='post-author__link']", xmlValue)
+    auth = xpathSApply(html, "//span[@class='user-info__nickname user-info__nickname_small']", xmlValue)
     
     # write to csv
     for (i in 1:length(id)) {
@@ -83,7 +84,8 @@ readHabr <- function (basePath, months, limitNumber = 0, startFrom = 1, dayShift
       # convert readed dates into R recognizable smth
       q=dateProc(dates, i, months)         
       # extract author name
-      authName = strsplit(strsplit(auth[i], "@")[[1]][2], "\n")[[1]][1]
+
+      authName = auth[i] # strsplit(strsplit(auth[i], "@")[[1]][2], "\n")[[1]][1]
       if (traceAuthors && authName %in% authorsList)            {
         titles[i] = paste('@@@', titles[i], sep=' ')
       } else if (markAuthorsNegative && authName %in% negativeAuthorsList) {
