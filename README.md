@@ -30,6 +30,12 @@ readHabr("http://geektimes.ru/hub/google/", startFrom = 1, limitNumber = 20, day
 Работает со всеми ресурсами на хабре, гиктаймс, мегамозге, имеющими форму "ресурс/page{n}"
 
 ## Зависимости
-RCurl требует установки libcurl4-gnutls-dev (http://askubuntu.com/questions/359267/cannot-find-curl-config-in-ubuntu-13-04)
-XML требует xml2-config
-Работало на Debian Jessie (BunsenLabs Hydrogen) 32x и 64x. Под Windows не тестировал.
+Linux (Под Windows не тестировал)
+* RCurl требует установки libcurl4-gnutls-dev (http://askubuntu.com/questions/359267/cannot-find-curl-config-in-ubuntu-13-04)
+* XML требует libxml2-dev (https://stackoverflow.com/questions/19904083/how-to-fix-error-with-xml2-config-not-found-when-installing-php-from-sources)
+
+## Где работало
+* Mint
+* Debian Jessie
+* Debian Stretch
+* BunsenLabs Hydrogen
